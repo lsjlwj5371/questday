@@ -57,16 +57,28 @@ const KEYWORD_MISSIONS: Record<string, string[]> = {
   "헬스": ["웨이트 트레이닝 40분", "유산소 20분", "프로틴 섭취", "운동 일지 기록", "스트레칭 10분"],
 };
 
-export function recommendMissions({ title, category, daysLeft }: RecommendInput): string[] {
+/** 특정 날짜 하루치 미션을 추천 (매일 다른 조합) */
+export function recommendDailyMissions({ title, category, daysLeft }: RecommendInput, seed: number = 0): string[] {
   const results: string[] = [];
+
+  // seed 기반 셔플 (같은 seed → 같은 결과, 다른 날짜 → 다른 조합)
+  function seededShuffle<T>(arr: T[], s: number): T[] {
+    const a = [...arr];
+    let current = s;
+    for (let i = a.length - 1; i > 0; i--) {
+      current = (current * 1103515245 + 12345) & 0x7fffffff;
+      const j = current % (i + 1);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
   // 1. 제목 키워드 매칭으로 구체적 미션 추가
   const titleLower = title.toLowerCase();
   for (const [keyword, missions] of Object.entries(KEYWORD_MISSIONS)) {
     if (titleLower.includes(keyword.toLowerCase())) {
-      // 남은 기간에 따라 추천 개수 조절
       const count = daysLeft <= 7 ? 5 : daysLeft <= 30 ? 4 : 3;
-      const shuffled = [...missions].sort(() => Math.random() - 0.5);
+      const shuffled = seededShuffle(missions, seed);
       results.push(...shuffled.slice(0, count));
       break;
     }
@@ -75,20 +87,54 @@ export function recommendMissions({ title, category, daysLeft }: RecommendInput)
   // 2. 키워드 매칭이 없으면 카테고리 기반 추천
   if (results.length === 0) {
     const templates = MISSION_TEMPLATES[category] ?? MISSION_TEMPLATES["기타"];
-    const shuffled = templates.flat().sort(() => Math.random() - 0.5);
+    const allMissions = templates.flat();
+    const shuffled = seededShuffle(allMissions, seed);
 
-    // 남은 기간에 따라 강도 조절
     if (daysLeft <= 7) {
-      // 단기: 집중 미션 5개
       results.push(...shuffled.slice(0, 5));
     } else if (daysLeft <= 30) {
-      // 중기: 균형 미션 4개
       results.push(...shuffled.slice(0, 4));
     } else {
-      // 장기: 꾸준함 미션 3개
       results.push(...shuffled.slice(0, 3));
     }
   }
 
   return results;
+}
+
+/** 기존 호환용 (랜덤) */
+export function recommendMissions(input: RecommendInput): string[] {
+  return recommendDailyMissions(input, Math.floor(Math.random() * 100000));
+}
+
+/** 퀘스트 생성 시 오늘부터 목표일까지 모든 날짜의 미션을 한번에 생성 */
+export function generateAllMissions(
+  title: string,
+  category: string,
+  targetDate: string
+): { date: string; missions: string[] }[] {
+  const target = new Date(targetDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
+
+  const totalDays = Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  if (totalDays <= 0) return [];
+
+  const result: { date: string; missions: string[] }[] = [];
+
+  for (let i = 0; i < totalDays; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    const dateStr = d.toISOString().split("T")[0];
+    const daysLeft = totalDays - i;
+
+    // 날짜 기반 seed → 같은 날짜에는 같은 미션, 다른 날짜는 다른 조합
+    const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate() + i * 7;
+    const missions = recommendDailyMissions({ title, category, daysLeft }, seed);
+
+    result.push({ date: dateStr, missions });
+  }
+
+  return result;
 }

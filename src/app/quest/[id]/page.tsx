@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { recommendMissions } from "@/lib/mission-recommend";
+import { recommendMissions, recommendDailyMissions } from "@/lib/mission-recommend";
 import Bubbles from "@/components/Bubbles";
 import Navbar from "@/components/Navbar";
 import { useParams, useRouter } from "next/navigation";
@@ -64,6 +64,28 @@ export default function QuestDetailPage() {
     const existingTitles = missions.map((m) => m.title);
     setRecommendations(recs.filter((r) => !existingTitles.includes(r)));
     setShowRec(true);
+  }
+
+  async function regenerateTodayMissions() {
+    if (!quest) return;
+    if (!confirm("오늘의 미션을 모두 삭제하고 새로 생성할까요?\n(완료된 미션도 초기화됩니다)")) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // 오늘 미션 전부 삭제
+    await supabase.from("missions").delete().eq("quest_id", questId).eq("date", today);
+
+    // 새 미션 생성 (랜덤 seed로 다른 조합)
+    const daysLeft = Math.ceil((new Date(quest.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    const newSeed = Date.now(); // 현재 시각 기반 → 매번 다른 조합
+    const newMissions = recommendDailyMissions({ title: quest.title, category: quest.category, daysLeft }, newSeed);
+
+    await supabase.from("missions").insert(
+      newMissions.map((title) => ({ quest_id: questId, user_id: user.id, title, date: today }))
+    );
+
+    loadData();
   }
 
   async function deleteMission(missionId: string) { await supabase.from("missions").delete().eq("id", missionId); loadData(); }
@@ -147,10 +169,16 @@ export default function QuestDetailPage() {
                 <button type="submit" className="btn-primary px-5 py-3 text-sm">추가</button>
               </form>
 
-              <button onClick={generateRecommendations}
-                className="w-full py-3 rounded-2xl text-sm font-medium text-[#1b2559] bg-[#f0f1f5] hover:bg-[#e2e4ed] transition-colors">
-                ✨ 미션 추천받기
-              </button>
+              <div className="flex gap-2">
+                <button onClick={regenerateTodayMissions}
+                  className="flex-1 py-3 rounded-2xl text-sm font-medium text-[#e07070] bg-[#fef2f2] hover:bg-[#fee2e2] transition-colors">
+                  🔄 오늘 미션 다시 생성
+                </button>
+                <button onClick={generateRecommendations}
+                  className="flex-1 py-3 rounded-2xl text-sm font-medium text-[#1b2559] bg-[#f0f1f5] hover:bg-[#e2e4ed] transition-colors">
+                  ✨ 미션 추가 추천
+                </button>
+              </div>
             </div>
 
             {/* 추천 미션 */}
