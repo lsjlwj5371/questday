@@ -1,14 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FFF8F0;
-  --foreground: #2D2D3F;
-  --primary: #7C5CFC;
-  --secondary: #FF6B9D;
-  --success: #36D399;
-  --warning: #FBBD23;
-  --card: #FFFFFF;
-  --text-light: #9CA3AF;
+  --background: #c8cad8;
+  --foreground: #2e3347;
+  --primary: #5b7fd6;
+  --secondary: #8ba4e8;
+  --accent: #a3b5f0;
+  --success: #6dd4a8;
+  --warning: #f0c864;
+  --card: rgba(255, 255, 255, 0.45);
+  --card-border: rgba(255, 255, 255, 0.6);
+  --text-light: #7c809a;
+  --glass-shadow: 0 8px 32px rgba(46, 51, 71, 0.12);
+  --glass-inner: inset 0 1px 1px rgba(255, 255, 255, 0.6);
 }
 
 @theme inline {
@@ -16,16 +20,81 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
   --color-success: var(--success);
   --color-warning: var(--warning);
-  --color-card: var(--card);
-  --color-text-light: var(--text-light);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(145deg, #b8bace, #d0d2de, #c0c3d2);
   color: var(--foreground);
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* 글래스 카드 */
+.glass {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 8px 32px rgba(46, 51, 71, 0.10),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+/* 글래스 카드 호버 */
+.glass-hover {
+  transition: all 0.3s ease;
+}
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 12px 40px rgba(46, 51, 71, 0.14),
+    inset 0 1px 2px rgba(255, 255, 255, 0.7);
+  transform: translateY(-1px);
+}
+
+/* 젤리 버튼 */
+.jelly-btn {
+  background: linear-gradient(145deg, #6888dc, #5070c8);
+  box-shadow:
+    0 6px 20px rgba(91, 127, 214, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+.jelly-btn:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow:
+    0 8px 28px rgba(91, 127, 214, 0.45),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+.jelly-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* 젤리 뱃지 */
+.jelly-badge {
+  background: linear-gradient(145deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  box-shadow:
+    0 2px 8px rgba(46, 51, 71, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+/* 프로그레스 바 광택 */
+.progress-shine {
+  position: relative;
+  overflow: hidden;
+}
+.progress-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent);
+  border-radius: inherit;
 }

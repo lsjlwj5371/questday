@@ -16,18 +16,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFF8F0] px-6">
-      <div className="w-full max-w-md text-center">
-        <h1 className="text-3xl font-bold text-[#2D2D3F] mb-1">QuestDay</h1>
-        <p className="text-[#9CA3AF] text-sm mb-6">목표를 퀘스트로, 매일을 레벨업으로</p>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6">
+      <div className="w-full max-w-sm text-center">
+        {/* 로고 */}
+        <div className="mb-4">
+          <h1 className="text-3xl font-bold text-[#2e3347]">QuestDay</h1>
+          <p className="text-[#7c809a] text-sm mt-1">목표를 퀘스트로, 매일을 레벨업으로</p>
+        </div>
 
-        <JellySqueeze title="꾹 눌러보세요!" className="mb-6" />
+        {/* 젤리 마스코트 */}
+        <div className="glass rounded-3xl p-2 mb-6">
+          <JellySqueeze title="꾹 눌러보세요!" />
+        </div>
 
-        <p className="text-[#2D2D3F] font-medium mb-6">목표를 꾹 눌러 달성하세요</p>
+        {/* 슬로건 */}
+        <p className="text-[#2e3347] font-medium mb-5 text-sm">목표를 꾹 눌러 달성하세요</p>
 
+        {/* 로그인 버튼 */}
         <button
           onClick={handleGoogleLogin}
-          className="w-full py-3.5 px-4 bg-[#7C5CFC] text-white rounded-2xl font-medium hover:bg-[#6A4CE0] transition-colors shadow-sm"
+          className="w-full py-3.5 px-4 text-white rounded-2xl font-medium jelly-btn"
         >
           Google로 시작하기
         </button>
