@@ -2,8 +2,8 @@
 
 import { createClient } from "@/lib/supabase/client";
 import Bubbles from "@/components/Bubbles";
+import Navbar from "@/components/Navbar";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 interface LeaderboardEntry { user_id: string; nickname: string; weekly_xp: number; }
 
@@ -25,28 +25,28 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen relative">
       <Bubbles />
-      <div className="max-w-lg mx-auto px-4 py-6 relative z-10">
-        <div className="flex items-center gap-3 mb-6">
-          <Link href="/dashboard" className="text-[#6b7094] hover:text-[#1a1d2e]">← 대시보드</Link>
-          <h1 className="text-xl font-bold text-[#1a1d2e]">🏆 주간 리더보드</h1>
-        </div>
+      <Navbar />
 
-        <div className="card overflow-hidden animate-in">
+      <div className="max-w-2xl mx-auto px-6 py-8 relative z-10">
+        <h1 className="text-3xl font-bold text-[#1a1d2e] mb-2 animate-in">🏆 주간 리더보드</h1>
+        <p className="text-[#6b7094] mb-8 animate-in">이번 주 가장 열심히 한 사람들</p>
+
+        <div className="card overflow-hidden animate-in animate-in-delay-1">
           {loading ? (
-            <p className="text-center py-10 text-[#6b7094]">로딩 중...</p>
+            <p className="text-center py-12 text-[#6b7094]">로딩 중...</p>
           ) : entries.length === 0 ? (
-            <p className="text-center py-10 text-[#6b7094]">아직 이번 주 활동이 없습니다</p>
+            <p className="text-center py-12 text-[#6b7094]">아직 이번 주 활동이 없습니다</p>
           ) : (
             entries.map((entry, i) => (
               <div key={entry.user_id}
-                className={`flex items-center gap-4 px-5 py-4 border-b border-[#f0f1f5] last:border-b-0 ${
+                className={`flex items-center gap-4 px-6 py-5 border-b border-[#f0f1f5] last:border-b-0 ${
                   i === 0 ? "bg-[#fefce8]" : ""
                 }`}>
-                <span className="w-8 text-center text-lg">
-                  {i < 3 ? medals[i] : <span className="text-[#6b7094] text-sm font-medium">{i + 1}</span>}
+                <span className="w-10 text-center text-xl">
+                  {i < 3 ? medals[i] : <span className="text-[#6b7094] text-base font-semibold">{i + 1}</span>}
                 </span>
-                <span className="flex-1 font-medium text-[#1a1d2e]">{entry.nickname}</span>
-                <span className="text-sm font-bold text-[#1b2559]">{entry.weekly_xp} XP</span>
+                <span className="flex-1 font-semibold text-[#1a1d2e]">{entry.nickname}</span>
+                <span className="text-sm font-bold text-[#1b2559] bg-[#f0f1f5] px-3 py-1.5 rounded-full">{entry.weekly_xp} XP</span>
               </div>
             ))
           )}
