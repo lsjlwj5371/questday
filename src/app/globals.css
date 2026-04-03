@@ -1,100 +1,150 @@
 @import "tailwindcss";
 
 :root {
-  --background: #c8cad8;
-  --foreground: #2e3347;
-  --primary: #5b7fd6;
-  --secondary: #8ba4e8;
-  --accent: #a3b5f0;
-  --success: #6dd4a8;
-  --warning: #f0c864;
-  --card: rgba(255, 255, 255, 0.45);
-  --card-border: rgba(255, 255, 255, 0.6);
-  --text-light: #7c809a;
-  --glass-shadow: 0 8px 32px rgba(46, 51, 71, 0.12);
-  --glass-inner: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  --background: #f0f1f5;
+  --foreground: #1a1d2e;
+  --primary: #1b2559;
+  --primary-light: #2d3a80;
+  --accent: #4a6cf7;
+  --success: #1b2559;
+  --card: #ffffff;
+  --text-sub: #6b7094;
+  --border: #e2e4ed;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
   --color-accent: var(--accent);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: linear-gradient(145deg, #b8bace, #d0d2de, #c0c3d2);
+  background: var(--background);
   color: var(--foreground);
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* 글래스 카드 */
-.glass {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow:
-    0 8px 32px rgba(46, 51, 71, 0.10),
-    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+/* 버블 장식 */
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%,
+    rgba(255,255,255,0.8),
+    rgba(200,220,255,0.2) 50%,
+    rgba(180,240,240,0.15) 70%,
+    transparent 100%);
+  border: 1px solid rgba(255,255,255,0.5);
+  pointer-events: none;
 }
 
-/* 글래스 카드 호버 */
-.glass-hover {
-  transition: all 0.3s ease;
+/* 버블 떠다니는 모션 */
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(15px, -20px) rotate(5deg); }
+  50% { transform: translate(-10px, -35px) rotate(-3deg); }
+  75% { transform: translate(20px, -15px) rotate(4deg); }
 }
-.glass-hover:hover {
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow:
-    0 12px 40px rgba(46, 51, 71, 0.14),
-    inset 0 1px 2px rgba(255, 255, 255, 0.7);
-  transform: translateY(-1px);
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-20px, -25px) rotate(-4deg); }
+  66% { transform: translate(15px, -40px) rotate(6deg); }
 }
-
-/* 젤리 버튼 */
-.jelly-btn {
-  background: linear-gradient(145deg, #6888dc, #5070c8);
-  box-shadow:
-    0 6px 20px rgba(91, 127, 214, 0.35),
-    inset 0 1px 1px rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-}
-.jelly-btn:hover {
-  transform: translateY(-1px) scale(1.01);
-  box-shadow:
-    0 8px 28px rgba(91, 127, 214, 0.45),
-    inset 0 1px 2px rgba(255, 255, 255, 0.4);
-}
-.jelly-btn:active {
-  transform: translateY(1px) scale(0.98);
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10px, -30px) scale(1.05); }
 }
 
-/* 젤리 뱃지 */
-.jelly-badge {
-  background: linear-gradient(145deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
-  box-shadow:
-    0 2px 8px rgba(46, 51, 71, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+.bubble-1 { animation: float1 8s ease-in-out infinite; }
+.bubble-2 { animation: float2 10s ease-in-out infinite; }
+.bubble-3 { animation: float3 12s ease-in-out infinite; }
+.bubble-4 { animation: float1 9s ease-in-out infinite reverse; }
+.bubble-5 { animation: float2 11s ease-in-out infinite reverse; }
+
+/* 깔끔한 카드 */
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
-/* 프로그레스 바 광택 */
-.progress-shine {
+/* CTA 버튼 (네이비 pill) */
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border-radius: 100px;
+  font-weight: 600;
+  transition: all 0.25s ease;
   position: relative;
-  overflow: hidden;
 }
-.progress-shine::after {
+.btn-primary:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(27, 37, 89, 0.25);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* 그라데이션 보더 버튼 */
+.btn-gradient-border {
+  position: relative;
+  background: var(--primary);
+  color: white;
+  border-radius: 100px;
+  font-weight: 600;
+  padding: 14px 32px;
+  transition: all 0.25s ease;
+}
+.btn-gradient-border::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent);
-  border-radius: inherit;
+  inset: -2px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, #f7b84e, #f472b6, #818cf8, #38bdf8);
+  z-index: -1;
 }
+.btn-gradient-border:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(27, 37, 89, 0.3);
+}
+
+/* 체크마크 스타일 */
+.check-cell {
+  transition: all 0.2s ease;
+}
+.check-cell.checked {
+  color: var(--primary);
+}
+
+/* 프로그레스 바 */
+.progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+
+/* 페이드인 애니메이션 */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+.animate-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
+.animate-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
+.animate-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
+.animate-in-delay-4 { animation-delay: 0.4s; opacity: 0; }

@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import Bubbles from "@/components/Bubbles";
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -15,19 +16,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm text-center">
-        <div className="glass rounded-3xl p-10 mb-6">
-          <h1 className="text-4xl font-bold text-[#2e3347] mb-2">⚔️</h1>
-          <h2 className="text-2xl font-bold text-[#2e3347] mb-1">QuestDay</h2>
-          <p className="text-[#7c809a] text-sm mb-8">목표를 퀘스트로, 매일을 레벨업으로</p>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative">
+      <Bubbles />
+
+      <div className="w-full max-w-sm text-center relative z-10">
+        <div className="animate-in">
+          <div className="mb-10">
+            <div className="w-14 h-14 rounded-full bg-[#1b2559] flex items-center justify-center mx-auto mb-5">
+              <span className="text-white text-xl">⚔️</span>
+            </div>
+            <h1 className="text-4xl font-bold text-[#1a1d2e] leading-tight mb-3">
+              여기까지 온 거,<br />이미 절반은 하신 거예요
+            </h1>
+            <p className="text-[#6b7094] text-base leading-relaxed">
+              목표를 세우고, 매일 미션을 클리어하세요.<br />
+              30일이면 습관이 됩니다.
+            </p>
+          </div>
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full py-3.5 px-4 text-white rounded-2xl font-medium jelly-btn"
+            className="btn-gradient-border w-full text-base"
           >
-            Google로 시작하기
+            Google로 바로 시작하기 →
           </button>
+
+          <p className="text-[#6b7094] text-sm mt-5">
+            지금 시작하면 오늘이 Day 1
+          </p>
         </div>
       </div>
     </div>

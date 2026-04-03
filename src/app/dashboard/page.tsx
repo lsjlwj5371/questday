@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { levelProgress, xpForNextLevel } from "@/lib/xp";
 import MissionList from "@/components/MissionList";
 import GrassCalendar from "@/components/GrassCalendar";
+import Bubbles from "@/components/Bubbles";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -46,7 +47,7 @@ export default function DashboardPage() {
 
   async function handleLogout() { await supabase.auth.signOut(); router.push("/login"); }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-[#7c809a]">로딩 중...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-[#6b7094]">로딩 중...</div>;
 
   const completedToday = todayMissions.filter((m) => m.is_completed).length;
   const progress = levelProgress(profile?.total_xp ?? 0);
@@ -54,80 +55,87 @@ export default function DashboardPage() {
   const categoryEmoji: Record<string, string> = { "공부": "📚", "운동": "💪", "재테크": "💰", "자기계발": "🌱", "기타": "⚡" };
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
+    <div className="min-h-screen relative">
+      <Bubbles />
+
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-5 relative z-10">
 
         {/* 상단 바 */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-[#2e3347]">⚔️ QuestDay</h1>
+        <div className="flex items-center justify-between animate-in">
           <div className="flex items-center gap-3">
-            <span className="jelly-badge px-3 py-1 rounded-full text-sm font-bold text-[#5b7fd6]">
+            <div className="w-9 h-9 rounded-full bg-[#1b2559] flex items-center justify-center">
+              <span className="text-white text-sm">⚔️</span>
+            </div>
+            <span className="font-bold text-[#1a1d2e]">QuestDay</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-[#1b2559] bg-white px-3 py-1.5 rounded-full border border-[#e2e4ed]">
               Lv.{profile?.level ?? 1}
             </span>
-            <button onClick={handleLogout} className="text-xs text-[#7c809a] hover:text-[#2e3347]">로그아웃</button>
+            <button onClick={handleLogout} className="text-xs text-[#6b7094] hover:text-[#1a1d2e]">로그아웃</button>
           </div>
         </div>
 
-        {/* 레벨 & XP */}
-        <div className="glass rounded-3xl p-5">
+        {/* 히어로 + 스트릭 */}
+        <div className="animate-in animate-in-delay-1">
+          <h2 className="text-3xl font-bold text-[#1a1d2e] leading-tight mb-2">
+            {(profile?.current_streak ?? 0) > 0
+              ? <>🔥 {profile?.current_streak}일 연속<br/>달성 중이에요!</>
+              : <>오늘부터<br/>시작해볼까요?</>
+            }
+          </h2>
+          <p className="text-[#6b7094]">최대 기록 {profile?.max_streak ?? 0}일 · {profile?.total_xp ?? 0} XP</p>
+        </div>
+
+        {/* 레벨 프로그레스 */}
+        <div className="card p-5 animate-in animate-in-delay-2">
           <div className="flex items-center justify-between text-sm mb-3">
-            <span className="font-bold text-[#2e3347]">{profile?.nickname ?? ""}</span>
-            <span className="text-[#7c809a]">{profile?.total_xp ?? 0} / {nextLevelXP} XP</span>
+            <span className="font-semibold text-[#1a1d2e]">레벨 {profile?.level ?? 1}</span>
+            <span className="text-[#6b7094]">{profile?.total_xp ?? 0} / {nextLevelXP} XP</span>
           </div>
-          <div className="h-3 bg-white/30 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full progress-shine transition-all duration-500"
-              style={{ width: `${progress}%`, background: "linear-gradient(90deg, #5b7fd6, #8ba4e8)" }}
-            />
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
           </div>
-        </div>
-
-        {/* 스트릭 배너 */}
-        <div className="rounded-3xl p-5 text-white"
-             style={{
-               background: "linear-gradient(145deg, #5b7fd6, #7b9ae8)",
-               boxShadow: "0 8px 32px rgba(91, 127, 214, 0.3), inset 0 1px 1px rgba(255,255,255,0.3)"
-             }}>
-          <p className="text-2xl font-bold">🔥 {profile?.current_streak ?? 0}일 연속!</p>
-          <p className="text-sm opacity-70 mt-1">최대 기록: {profile?.max_streak ?? 0}일</p>
         </div>
 
         {/* 오늘의 미션 */}
-        <div className="glass rounded-3xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-bold text-[#2e3347]">📋 오늘의 미션</h2>
-            <span className="jelly-badge px-2 py-0.5 rounded-full text-xs text-[#7c809a]">{completedToday}/{todayMissions.length}</span>
+        <div className="card p-5 animate-in animate-in-delay-3">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-[#1a1d2e]">오늘의 미션</h3>
+            <span className="text-sm text-[#6b7094] bg-[#f0f1f5] px-2.5 py-1 rounded-full">
+              {completedToday}/{todayMissions.length}
+            </span>
           </div>
           {todayMissions.length > 0 ? (
             <MissionList missions={todayMissions} currentStreak={profile?.current_streak ?? 0} todayXP={todayXP} onUpdate={loadAll} />
           ) : (
-            <p className="text-center text-[#7c809a] py-4 text-sm">퀘스트에서 미션을 추가하세요</p>
+            <p className="text-center text-[#6b7094] py-6 text-sm">퀘스트에서 미션을 추가하세요</p>
           )}
         </div>
 
-        {/* 잔디 캘린더 */}
-        <div className="glass rounded-3xl p-5">
-          <h2 className="font-bold text-[#2e3347] mb-3">🗓️ 잔디 캘린더</h2>
+        {/* 나의 데일리 기록 (잔디) */}
+        <div className="card p-5 animate-in animate-in-delay-4">
+          <h3 className="font-bold text-[#1a1d2e] mb-4">나의 데일리 기록</h3>
           <GrassCalendar activities={activities} />
         </div>
 
         {/* 진행중인 퀘스트 */}
-        <div className="glass rounded-3xl p-5">
-          <h2 className="font-bold text-[#2e3347] mb-3">⚔️ 진행중인 퀘스트</h2>
+        <div className="card p-5 animate-in">
+          <h3 className="font-bold text-[#1a1d2e] mb-4">진행중인 퀘스트</h3>
           <div className="space-y-2">
             {quests.map((quest) => {
               const dDay = Math.ceil((new Date(quest.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
               return (
                 <Link key={quest.id} href={`/quest/${quest.id}`}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-white/25 hover:bg-white/40 transition-all glass-hover">
+                  className="flex items-center justify-between p-4 rounded-2xl bg-[#f7f8fa] hover:bg-[#eef0f5] transition-all">
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{categoryEmoji[quest.category] ?? "⚡"}</span>
                     <div>
-                      <p className="font-medium text-sm text-[#2e3347]">{quest.title}</p>
-                      <span className="text-xs text-[#7c809a]">{quest.category}</span>
+                      <p className="font-medium text-sm text-[#1a1d2e]">{quest.title}</p>
+                      <span className="text-xs text-[#6b7094]">{quest.category}</span>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-[#5b7fd6]">
+                  <span className="text-sm font-bold text-[#1b2559]">
                     {dDay > 0 ? `D-${dDay}` : dDay === 0 ? "D-Day!" : `D+${Math.abs(dDay)}`}
                   </span>
                 </Link>
@@ -135,14 +143,13 @@ export default function DashboardPage() {
             })}
           </div>
           <Link href="/quest/new"
-            className="block mt-3 text-center py-3 rounded-2xl border-2 border-dashed border-white/40 text-[#5b7fd6] hover:bg-white/20 transition-colors text-sm font-medium">
+            className="block mt-3 text-center py-3 rounded-2xl border-2 border-dashed border-[#e2e4ed] text-[#6b7094] hover:border-[#1b2559] hover:text-[#1b2559] transition-colors text-sm font-medium">
             + 새 퀘스트 추가
           </Link>
         </div>
 
         {/* 리더보드 */}
-        <Link href="/leaderboard"
-          className="block glass rounded-3xl p-4 text-center font-medium text-[#f0c864] hover:bg-white/50 transition-all glass-hover">
+        <Link href="/leaderboard" className="block btn-primary text-center py-4 animate-in">
           🏆 주간 리더보드 보기
         </Link>
       </div>

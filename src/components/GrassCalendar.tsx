@@ -4,10 +4,10 @@ interface ActivityDay { date: string; missions_completed: number; }
 interface GrassCalendarProps { activities: ActivityDay[]; }
 
 function getColor(count: number): string {
-  if (count === 0) return "bg-white/20";
-  if (count <= 2) return "bg-[#6dd4a8]/40";
-  if (count <= 4) return "bg-[#6dd4a8]/70";
-  return "bg-[#6dd4a8]";
+  if (count === 0) return "bg-[#f0f1f5]";
+  if (count <= 2) return "bg-[#c7d2fe]";
+  if (count <= 4) return "bg-[#818cf8]";
+  return "bg-[#1b2559]";
 }
 
 export default function GrassCalendar({ activities }: GrassCalendarProps) {
@@ -35,8 +35,7 @@ export default function GrassCalendar({ activities }: GrassCalendarProps) {
         <div
           key={cell.date}
           title={`${cell.date}: ${cell.count}개 완료`}
-          className={`aspect-square rounded-[4px] ${getColor(cell.count)}`}
-          style={cell.count > 0 ? { boxShadow: "inset 0 1px 1px rgba(255,255,255,0.3)" } : {}}
+          className={`aspect-square rounded-[4px] transition-colors ${getColor(cell.count)}`}
         />
       ))}
     </div>
