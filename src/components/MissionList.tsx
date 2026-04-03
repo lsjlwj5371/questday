@@ -24,22 +24,19 @@ export default function MissionList({ missions, currentStreak, todayXP, onUpdate
   const [animatingId, setAnimatingId] = useState<string | null>(null);
 
   async function toggleMission(mission: Mission) {
-    if (mission.is_completed) return; // 완료 취소는 지원하지 않음
+    if (mission.is_completed) return;
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // XP 계산
     const earnedXP = calculateMissionXP(currentStreak);
     const actualXP = awardXP(todayXP, earnedXP);
 
-    // 미션 완료 처리
     await supabase
       .from("missions")
       .update({ is_completed: true, completed_at: new Date().toISOString() })
       .eq("id", mission.id);
 
-    // activity_log upsert
     const today = new Date().toISOString().split("T")[0];
     const { data: existing } = await supabase
       .from("activity_log")
@@ -65,7 +62,6 @@ export default function MissionList({ missions, currentStreak, todayXP, onUpdate
       });
     }
 
-    // users 테이블 XP/레벨 업데이트
     const { data: profile } = await supabase
       .from("users")
       .select("total_xp")
@@ -80,7 +76,6 @@ export default function MissionList({ missions, currentStreak, todayXP, onUpdate
       .update({ total_xp: newTotalXP, level: newLevel })
       .eq("id", user.id);
 
-    // 애니메이션
     setAnimatingId(mission.id);
     setTimeout(() => setAnimatingId(null), 600);
 
@@ -94,23 +89,23 @@ export default function MissionList({ missions, currentStreak, todayXP, onUpdate
           key={mission.id}
           onClick={() => toggleMission(mission)}
           disabled={mission.is_completed}
-          className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${
+          className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left ${
             mission.is_completed
-              ? "bg-green-50 text-gray-400"
-              : "bg-gray-50 hover:bg-gray-100"
+              ? "bg-[#36D399]/10"
+              : "bg-[#FFF8F0] hover:bg-[#F5F0E8]"
           } ${animatingId === mission.id ? "scale-95" : ""}`}
         >
-          <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+          <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs ${
             mission.is_completed
-              ? "bg-green-400 border-green-400 text-white"
-              : "border-gray-300"
+              ? "bg-[#36D399] border-[#36D399] text-white"
+              : "border-[#9CA3AF]"
           }`}>
             {mission.is_completed && "✓"}
           </span>
-          <span className={`flex-1 text-sm ${mission.is_completed ? "line-through" : ""}`}>
+          <span className={`flex-1 text-sm ${mission.is_completed ? "line-through text-[#9CA3AF]" : "text-[#2D2D3F]"}`}>
             {mission.title}
           </span>
-          <span className="text-xs text-gray-400">+{mission.xp_reward} XP</span>
+          <span className="text-xs font-bold text-[#FBBD23]">+{mission.xp_reward} XP</span>
         </button>
       ))}
     </div>

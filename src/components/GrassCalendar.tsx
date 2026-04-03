@@ -10,14 +10,13 @@ interface GrassCalendarProps {
 }
 
 function getColor(count: number): string {
-  if (count === 0) return "bg-gray-100";
-  if (count <= 2) return "bg-green-200";
-  if (count <= 4) return "bg-green-400";
-  return "bg-green-500";
+  if (count === 0) return "bg-[#F3F4F6]";
+  if (count <= 2) return "bg-[#D5F5E3]";
+  if (count <= 4) return "bg-[#6EE7B7]";
+  return "bg-[#36D399]";
 }
 
 export default function GrassCalendar({ activities }: GrassCalendarProps) {
-  // 최근 90일 기준
   const days = 90;
   const today = new Date();
   const cells: { date: string; count: number }[] = [];
@@ -30,24 +29,21 @@ export default function GrassCalendar({ activities }: GrassCalendarProps) {
     cells.push({ date: dateStr, count: activity?.missions_completed ?? 0 });
   }
 
-  // 7행 (요일) x N열로 배치
   const weeks = Math.ceil(cells.length / 7);
 
   return (
-    <div>
-      <div className="grid gap-[3px]" style={{
-        gridTemplateColumns: `repeat(${weeks}, 1fr)`,
-        gridTemplateRows: "repeat(7, 1fr)",
-        gridAutoFlow: "column",
-      }}>
-        {cells.map((cell) => (
-          <div
-            key={cell.date}
-            title={`${cell.date}: ${cell.count}개 완료`}
-            className={`aspect-square rounded-[3px] ${getColor(cell.count)}`}
-          />
-        ))}
-      </div>
+    <div className="grid gap-[3px]" style={{
+      gridTemplateColumns: `repeat(${weeks}, 1fr)`,
+      gridTemplateRows: "repeat(7, 1fr)",
+      gridAutoFlow: "column",
+    }}>
+      {cells.map((cell) => (
+        <div
+          key={cell.date}
+          title={`${cell.date}: ${cell.count}개 완료`}
+          className={`aspect-square rounded-[4px] ${getColor(cell.count)}`}
+        />
+      ))}
     </div>
   );
 }

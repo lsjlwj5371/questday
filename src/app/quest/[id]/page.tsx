@@ -20,6 +20,10 @@ interface Mission {
   date: string;
 }
 
+const categoryEmoji: Record<string, string> = {
+  "공부": "📚", "운동": "💪", "재테크": "💰", "자기계발": "🌱", "기타": "⚡",
+};
+
 export default function QuestDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -33,24 +37,13 @@ export default function QuestDetailPage() {
 
   const today = new Date().toISOString().split("T")[0];
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
   async function loadData() {
     const { data: questData } = await supabase
-      .from("quests")
-      .select("*")
-      .eq("id", questId)
-      .single();
-
+      .from("quests").select("*").eq("id", questId).single();
     const { data: missionData } = await supabase
-      .from("missions")
-      .select("*")
-      .eq("quest_id", questId)
-      .eq("date", today)
-      .order("created_at");
-
+      .from("missions").select("*").eq("quest_id", questId).eq("date", today).order("created_at");
     setQuest(questData);
     setMissions(missionData ?? []);
     setLoading(false);
@@ -59,17 +52,11 @@ export default function QuestDetailPage() {
   async function addMission(e: React.FormEvent) {
     e.preventDefault();
     if (!newMission.trim()) return;
-
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-
     await supabase.from("missions").insert({
-      quest_id: questId,
-      user_id: user.id,
-      title: newMission,
-      date: today,
+      quest_id: questId, user_id: user.id, title: newMission, date: today,
     });
-
     setNewMission("");
     loadData();
   }
@@ -85,77 +72,81 @@ export default function QuestDetailPage() {
     router.push("/dashboard");
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">로딩 중...</div>;
-  if (!quest) return <div className="min-h-screen flex items-center justify-center">퀘스트를 찾을 수 없습니다</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0] text-[#9CA3AF]">로딩 중...</div>;
+  if (!quest) return <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0] text-[#9CA3AF]">퀘스트를 찾을 수 없습니다</div>;
 
   const dDay = Math.ceil((new Date(quest.target_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const completedCount = missions.filter((m) => m.is_completed).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-lg mx-auto px-4 py-6">
+    <div className="min-h-screen bg-[#FFF8F0]">
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
         {/* 헤더 */}
-        <div className="flex items-center justify-between mb-6">
-          <button onClick={() => router.push("/dashboard")} className="text-gray-500 hover:text-gray-700">
+        <div className="flex items-center justify-between">
+          <button onClick={() => router.push("/dashboard")} className="text-[#9CA3AF] hover:text-[#2D2D3F]">
             ← 대시보드
           </button>
-          <button onClick={deleteQuest} className="text-red-400 hover:text-red-600 text-sm">
+          <button onClick={deleteQuest} className="text-[#FF6B9D] hover:text-red-500 text-sm">
             삭제
           </button>
         </div>
 
         {/* 퀘스트 정보 */}
-        <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">{quest.category}</span>
-            <span className="text-sm font-bold text-indigo-500">
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-2xl">{categoryEmoji[quest.category] ?? "⚡"}</span>
+            <span className="text-lg font-bold text-[#7C5CFC]">
               {dDay > 0 ? `D-${dDay}` : dDay === 0 ? "D-Day!" : `D+${Math.abs(dDay)}`}
             </span>
           </div>
-          <h2 className="text-xl font-bold">{quest.title}</h2>
-          <p className="text-sm text-gray-400 mt-1">{quest.target_date}</p>
+          <h2 className="text-xl font-bold text-[#2D2D3F]">{quest.title}</h2>
+          <p className="text-sm text-[#9CA3AF] mt-1">{quest.target_date} · {quest.category}</p>
         </div>
 
         {/* 오늘의 미션 */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold">오늘의 미션</h3>
-            <span className="text-sm text-gray-400">{completedCount}/{missions.length} 완료</span>
+            <h3 className="font-bold text-[#2D2D3F]">📋 오늘의 미션</h3>
+            <span className="text-sm text-[#9CA3AF]">{completedCount}/{missions.length}</span>
           </div>
 
-          {/* 미션 목록 */}
           <div className="space-y-2 mb-4">
             {missions.map((mission) => (
-              <div key={mission.id} className="flex items-center gap-3 py-2">
-                <span className={`flex-1 ${mission.is_completed ? "line-through text-gray-300" : ""}`}>
+              <div key={mission.id} className={`flex items-center gap-3 p-3 rounded-2xl ${
+                mission.is_completed ? "bg-[#36D399]/10" : "bg-[#FFF8F0]"
+              }`}>
+                <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs ${
+                  mission.is_completed ? "bg-[#36D399] border-[#36D399] text-white" : "border-[#9CA3AF]"
+                }`}>
+                  {mission.is_completed && "✓"}
+                </span>
+                <span className={`flex-1 text-sm ${mission.is_completed ? "line-through text-[#9CA3AF]" : "text-[#2D2D3F]"}`}>
                   {mission.title}
                 </span>
-                <span className="text-xs text-gray-400">+{mission.xp_reward} XP</span>
-                <button
-                  onClick={() => deleteMission(mission.id)}
-                  className="text-gray-300 hover:text-red-400 text-sm"
-                >
-                  ✕
-                </button>
+                <span className="text-xs font-bold text-[#FBBD23]">+{mission.xp_reward} XP</span>
+                {!mission.is_completed && (
+                  <button onClick={() => deleteMission(mission.id)} className="text-[#9CA3AF] hover:text-[#FF6B9D] text-sm">
+                    ✕
+                  </button>
+                )}
               </div>
             ))}
             {missions.length === 0 && (
-              <p className="text-center text-gray-300 py-4">아직 미션이 없습니다</p>
+              <p className="text-center text-[#9CA3AF] py-4 text-sm">아직 미션이 없습니다</p>
             )}
           </div>
 
-          {/* 미션 추가 */}
           <form onSubmit={addMission} className="flex gap-2">
             <input
               type="text"
               value={newMission}
               onChange={(e) => setNewMission(e.target.value)}
               placeholder="미션 추가..."
-              className="flex-1 px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="flex-1 px-4 py-2.5 rounded-2xl border border-gray-200 bg-[#FFF8F0] focus:outline-none focus:ring-2 focus:ring-[#7C5CFC] text-sm text-[#2D2D3F]"
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-sm font-medium hover:bg-indigo-600"
+              className="px-4 py-2.5 bg-[#7C5CFC] text-white rounded-2xl text-sm font-medium hover:bg-[#6A4CE0]"
             >
               추가
             </button>
